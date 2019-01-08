@@ -105,3 +105,4 @@ venv.bak/
 
 # custom gitignore
 /myfiles
+test_*.py
