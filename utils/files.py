@@ -27,3 +27,13 @@ def get_files_in_directory(path, pattern="*.csv"):
         pattern (string): Eg: "*.* for all, ".*" for zip files
     """
     return glob.glob(path+"/"+pattern)
+
+
+def series_to_obj(ts, cat=None):
+    obj = {"start": str(ts.index[0]), "target": list(ts)}
+    if cat is not None:
+        obj["cat"] = cat
+    return obj
+
+def series_to_jsonline(ts, cat=None):
+    return json.dumps(series_to_obj(ts, cat))    

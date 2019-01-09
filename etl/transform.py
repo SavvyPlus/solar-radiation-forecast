@@ -1,6 +1,8 @@
+import config
 import pandas as pd
 
 from utils import files
+from . import helpers
 
 
 def split_radiationtype(raw_path):
@@ -25,3 +27,26 @@ def convert_to_timeseries(raw_path):
         df = df.drop(['year', 'month', 'radiationtype'], axis=1)
         ts_path = raw_file.replace('raw', 'ts')
         df.to_csv(path_or_buf=ts_path, index_label='ts')
+
+
+def create_json_files(ts_list, final_path='./data/final', encoding="utf-8"):
+    train = []
+    test = []
+
+    for ts_info in ts_list:
+        ts_files = files.get_files_in_directory(ts_info['path'], '*.csv')
+        for ts_file in ts_files:
+            cat = helpers.categorize_from_filename(ts_file.split('/')[-1], ts_info['radiationtype'])
+            ts = pd.read_csv(ts_file, header=0, index_col=0, parse_dates=True, squeeze=True)
+            train.append(files.series_to_jsonline(ts[:-config.PREDICTION_LENGTH], cat))
+            test.append(files.series_to_jsonline(ts, cat))
+
+    with open(final_path + '/train.json', 'wb') as fp:
+        for tr in train:
+            fp.write(tr.encode(encoding))
+            fp.write('\n'.encode(encoding))
+
+    with open(final_path + '/test.json', 'wb') as fp:
+        for tr in train:
+            fp.write(tr.encode(encoding))
+            fp.write('\n'.encode(encoding))
