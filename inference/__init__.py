@@ -1,1 +1,0 @@
-from sagemaker_invoker import predict_single_timeseries 

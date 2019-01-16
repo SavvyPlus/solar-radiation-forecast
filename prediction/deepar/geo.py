@@ -5,7 +5,8 @@ from geopy.distance import geodesic, great_circle
 
 
 def calculate_distance(point_a, point_b, method=great_circle):
-    """Calulcate distance between two locations.
+    """
+    Calulcate distance between two locations.
 
     Parameters
     ----------
@@ -28,7 +29,8 @@ def calculate_distance(point_a, point_b, method=great_circle):
 
 
 def categorize_location(point, categories):
-    """Get nearest category for one specific location.
+    """
+    Get nearest category for one specific location.
 
     Parameters
     ----------

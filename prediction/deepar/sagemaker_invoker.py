@@ -27,7 +27,8 @@ NUM_SAMPLES = 100
 
 def build_request_data(start, target, cat, quantiles,
                        num_samples, output_types):
-    """Build DeepAR JSON tequest formats.
+    """
+    Build DeepAR JSON tequest formats.
     https://docs.aws.amazon.com/sagemaker/latest/dg/deepar-in-formats.html
 
     Parameters
@@ -71,7 +72,8 @@ def build_request_data(start, target, cat, quantiles,
 
 
 def get_predicted_series(result, num_samples, q1, q2):
-    """Parse result from DeepAR JSON response.
+    """
+    Parse result from DeepAR JSON response.
     https://docs.aws.amazon.com/sagemaker/latest/dg/deepar-in-formats.html
 
     Parameters
@@ -88,7 +90,7 @@ def get_predicted_series(result, num_samples, q1, q2):
 
     Returns
     -------
-    result : dict
+    results : dict
 
     """
     json_result = json.loads(result)
@@ -98,13 +100,13 @@ def get_predicted_series(result, num_samples, q1, q2):
     y_q2        = y_data['quantiles'][q2]
     y_sample    = y_data['samples'][random.randint(0, num_samples)]
 
-    result = {
+    results = {
         'y_mean': y_mean,
         'y_q1': y_q1,
         'y_q2': y_q2,
         'y_sample': y_sample
     }
-    return result
+    return results
 
 
 def predict_single_timeseries(start, target, cat=[],
