@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 import pandas as pd
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 
-from prediction import prophet
+from predictor import prophet
 
 from utils import files
 

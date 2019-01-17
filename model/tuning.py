@@ -12,18 +12,20 @@ train_prefix   = '{}/{}'.format(prefix, 'train')
 test_prefix    = '{}/{}'.format(prefix, 'test')
 output_prefix  = '{}/{}'.format(prefix, 'output')
 
-train_key = ''
-test_key = ''
+train_key = 'train.json'
+test_key = 'test.json'
+
+# init sagemaker
+sagemaker_session = sagemaker.Session()
+role = get_execution_role()
+region = boto3.Session().region_name
+
 
 train_path  = sagemaker_session.upload_data(train_key, bucket=bucket, key_prefix=train_prefix)
 test_path   = sagemaker_session.upload_data(test_key,  bucket=bucket, key_prefix=test_prefix)
 output_path = 's3://{}/{}'.format(bucket, output_prefix)
 
 
-# init sagemaker
-sagemaker_session = sagemaker.Session()
-role = get_execution_role()
-region = boto3.Session().region_name
 
 # we configure the container image to be used for the region that we are running in
 from sagemaker.amazon.amazon_estimator import get_image_uri
@@ -47,7 +49,7 @@ estimator = sagemaker.estimator.Estimator(
 # https://docs.aws.amazon.com/sagemaker/latest/dg/deepar_hyperparameters.html
 
 hyperparameters = {
-    "time_freq": freq, # daily series
+    "time_freq": freq, # monthly series
     # "context_length": str(prediction_length),
     "prediction_length": str(prediction_length), # number of data points to predict
     # "num_cells": "40",
@@ -57,7 +59,7 @@ hyperparameters = {
     # "mini_batch_size": "32",
     # "learning_rate": "0.00001",
     # "dropout_rate": "0.05",
-    "early_stopping_patience": "10" # stop if loss hasn't improved in 10 epochs
+    "early_stopping_patience": "40" # stop if loss hasn't improved in 10 epochs
 }
 
 estimator.set_hyperparameters(**hyperparameters)
@@ -70,12 +72,12 @@ from sagemaker.tuner import HyperparameterTuner, IntegerParameter, CategoricalPa
 #                          'num_epoch': IntegerParameter(10, 50)}
 
 hyperparameter_ranges = {
-    'mini_batch_size': IntegerParameterRanges(32, 800),
+    'mini_batch_size': IntegerParameter(32, 800),
     'epochs': IntegerParameter(1, 800),
     'context_length': IntegerParameter(prediction_length, 100),
     'num_cells': IntegerParameter(30, 200),
     'num_layers': IntegerParameter(1, 8),
-    'dropout_rate': ContinuousParameterRange(0.00, 0.2),
+    'dropout_rate': ContinuousParameter(0.00, 0.2),
     'embedding_dimension': IntegerParameter(1, 50),
     'learning_rate': ContinuousParameter(1e-5, 1e-1)
 }
@@ -92,7 +94,7 @@ tuner = HyperparameterTuner(estimator,
                             objective_metric_name,
                             hyperparameter_ranges,
                             metric_definitions,
-                            max_jobs=9,
+                            max_jobs=20,
                             max_parallel_jobs=3)
 
 data_channels = {"train": train_path, "test": test_path}

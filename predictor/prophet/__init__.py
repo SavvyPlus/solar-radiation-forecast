@@ -3,10 +3,10 @@
 import pandas as pd
 from fbprophet import Prophet
 
-from prediction import BasePrediction
+from predictor import BasePredictor
 
 
-class ProphetPrediction(BasePrediction):
+class ProphetPredictor(BasePredictor):
     def __init__(self, *args, **kwargs):
         super().__init__(*args)
         self.periods = kwargs.get('periods', 12)
