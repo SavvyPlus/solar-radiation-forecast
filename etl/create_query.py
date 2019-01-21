@@ -18,7 +18,17 @@ GROUP BY "year",
 """
 
 
-def create_sql_scripts(path):
+FORMAT_QUERY_MONTHLY = """
+SELECT date, radiationtype, radiation
+FROM "bom_parquet_test"
+WHERE (latitude = {}
+      AND longitude = {}
+      AND contains(ARRAY['2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018'], year)
+      )
+"""
+
+
+def create_sql_scripts(path, format_query=FORMAT_QUERY_GROUP_DATA):
     with open(path, 'w') as fp:
         for key in config.CATEGORIES.keys():
             fp.write("-- Scripts for {}\n".format(key))
@@ -26,13 +36,13 @@ def create_sql_scripts(path):
             sample_points = config.CATEGORIES[key]['sample']
             fp.write("-- -- Scripts for central_points\n")
             for central_point in central_points:
-                fp.write(FORMAT_QUERY_GROUP_DATA.format(central_point['lat'], central_point['long']))
+                fp.write(format_query.format(central_point['lat'], central_point['long']))
                 fp.write("\n-- -- -- \n")
             fp.write("-- -- End scripts for central_points\n")
 
             fp.write("-- -- Scripts for sample_points\n")
             for sample_point in sample_points:
-                fp.write(FORMAT_QUERY_GROUP_DATA.format(sample_point['lat'], sample_point['long']))
+                fp.write(format_query.format(sample_point['lat'], sample_point['long']))
                 fp.write("\n-- -- -- \n")
             fp.write("-- -- End scripts for sample_points\n")
             fp.write("-- End scripts for {}\n".format(key))
