@@ -113,7 +113,8 @@ def predict_single_timeseries(start, target, cat=[],
                               quantiles=[Q1, Q2],
                               num_samples=NUM_SAMPLES,
                               output_types=["mean", "quantiles", "samples"]):
-    """Root function to make predict.
+    """
+    Function to make predict for single series.
 
     Parameters
     ----------

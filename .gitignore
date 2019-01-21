@@ -103,6 +103,12 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+# PyCharm
+.idea
+
 # custom gitignore
 /myfiles
 test_*
+
+# hourly data
+/hourly_data
