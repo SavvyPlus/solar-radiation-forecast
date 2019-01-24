@@ -47,12 +47,17 @@ class ProphetPredictor(BasePredictor):
 
     def make_predict(self):
         df = self.create_dataframe()
-        m = Prophet(changepoint_prior_scale=0.5)
+        # m = Prophet(changepoint_prior_scale=0.5)
+        # m = Prophet(seasonality_mode='multiplicative')
+        m = Prophet()
+        # m = Prophet(interval_width=0.9, changepoint_prior_scale=0.5)
         m.fit(df)
-        if self.freq == 'M':
-            future = m.make_future_dataframe(periods=self.periods, freq='M')
-        else:
-            future = m.make_future_dataframe(periods=self.periods)
+        # if self.freq == 'M':
+        #     future = m.make_future_dataframe(periods=self.periods, freq='M')
+        # else:
+        #     future = m.make_future_dataframe(periods=self.periods)
+        future = m.make_future_dataframe(periods=self.periods, freq='H')
+        # future = m.make_future_dataframe(periods=self.periods)
         forecast = m.predict(future)
         predicted_data = forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].tail(self.periods)
 

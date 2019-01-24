@@ -78,7 +78,7 @@ def create_predictor(predictor_type, ts_values, y_values, **kwargs):
 
     try:
         predictor_cls = MAP_PREDICTOR[predictor_type]
-        predictor_obj = PredictorFactory(predictor_cls, *args, **kwargs)
+        predictor_obj = PredictorFactory(predictor_cls, ts_values, y_values, **kwargs)
         return predictor_obj
     except KeyError:
         raise ValueError('Only suport deepar and prophet predictor')

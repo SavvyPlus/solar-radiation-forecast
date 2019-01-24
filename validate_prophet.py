@@ -14,18 +14,18 @@ from predictor import prophet
 
 from utils import files
 
-PREDICTION_LENGTH = 24
+PREDICTION_LENGTH = 365
 
 ts_paths = [
-    {'path': './data/dni/ts', 'radiationtype': 'dni'},
-    {'path': './data/ghi/ts', 'radiationtype': 'ghi'}
+    {'path': './data/full/dni/nan', 'radiationtype': 'dni'},
+    {'path': './data/full/ghi/nan', 'radiationtype': 'ghi'}
 ]
 
 import numpy as np
 from matplotlib import pyplot as plt
 
 def plot_series(op, yhat, yhat_lower, yhat_upper, truth=False,
-                truth_data=None, truth_label='Truth', prediction_length=24):
+                truth_data=None, truth_label='Truth', prediction_length=365):
     x = range(0, PREDICTION_LENGTH)
     plt.gcf().clear()
     mean_label,   = plt.plot(x, yhat, label='mean')
@@ -49,11 +49,11 @@ for ts_info in ts_paths:
         truth_values = list(df.tail(PREDICTION_LENGTH)['radiation'])
         # create train data
         df = df[:len(df)-PREDICTION_LENGTH]
-        ds_values = list(df['ts'])
+        ds_values = list(df['date'])
         y_values = list(df['radiation'])
-        p = prophet.ProphetPrediction(ds_values, y_values, periods=24)
+        p = prophet.ProphetPredictor(ds_values, y_values, periods=365)
         results = p.make_predict()
-        op = './data/output/prophet/charts_scale/{}.png'.format(counter)
+        op = './data/full/output/prophet/{}.png'.format(counter)
         plot_series(op, results['y_mean'], results['y_q1'], results['y_q2'],
                     truth=True, truth_data=truth_values)
 
@@ -88,3 +88,5 @@ for ts_info in ts_paths:
         # f.write('\n--------------------------------\n\n')
 
         counter+=1
+        import sys
+        sys.exit(0)

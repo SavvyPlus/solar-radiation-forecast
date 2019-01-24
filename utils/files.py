@@ -1,5 +1,8 @@
+import math
 import json
 import glob
+
+import numpy as np
 
 
 def write_dicts_to_file(path, data):
@@ -30,10 +33,17 @@ def get_files_in_directory(path, pattern="*.csv"):
 
 
 def series_to_obj(ts, cat=None):
-    obj = {"start": str(ts.index[0]), "target": list(ts)}
+    def handle_na(value):
+        if math.isnan(value):
+            return None
+        return value
+    ts_list = list(ts)
+    ts_list = [handle_na(value) for value in ts_list]
+
+    obj = {"start": str(ts.index[0]), "target": ts_list}
     if cat is not None:
         obj["cat"] = cat
     return obj
 
 def series_to_jsonline(ts, cat=None):
-    return json.dumps(series_to_obj(ts, cat))    
+    return json.dumps(series_to_obj(ts, cat))

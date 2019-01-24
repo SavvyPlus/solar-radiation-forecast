@@ -11,7 +11,7 @@ SAGEMAKER_SESSION = sagemaker.Session()
 
 
 # TODO: import endpoint_name from somewhere else e.g. config file
-ENDPOINT_NAME = 'deepar-solar-forecast-v1'
+ENDPOINT_NAME = 'four-years-daily-v1'
 
 PREDICTOR = sagemaker.predictor.RealTimePredictor(
     ENDPOINT_NAME,
