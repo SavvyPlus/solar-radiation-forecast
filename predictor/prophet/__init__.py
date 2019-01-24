@@ -5,6 +5,8 @@ from fbprophet import Prophet
 
 from predictor import BasePredictor
 
+from . import helpers as p_helpers
+
 
 class ProphetPredictor(BasePredictor):
     def __init__(self, *args, **kwargs):
@@ -45,7 +47,7 @@ class ProphetPredictor(BasePredictor):
         return df
 
 
-    def make_predict(self):
+    def make_predict(self, night_filter=True):
         df = self.create_dataframe()
         # m = Prophet(changepoint_prior_scale=0.5)
         # m = Prophet(seasonality_mode='multiplicative')
@@ -59,7 +61,24 @@ class ProphetPredictor(BasePredictor):
         future = m.make_future_dataframe(periods=self.periods, freq='H')
         # future = m.make_future_dataframe(periods=self.periods)
         forecast = m.predict(future)
-        predicted_data = forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].tail(self.periods)
+        predicted_data = forecast[['ds', 'yhat', 'yhat_lower',
+                                   'yhat_upper']].tail(self.periods)
+
+        if night_filter:
+            night_patterns = p_helpers.get_night_patterns(df,
+                                                          index_col='ds',
+                                                          val_col='y',
+                                                          limit=17520)
+            predicted_data = p_helpers.fill_night_value(predicted_data,
+                                                        night_patterns,
+                                                        index_col='ds',
+                                                        value=0)
+            predicted_data = p_helpers.replace_negative_values(predicted_data,
+                                                               'yhat',
+                                                               threshold=0,
+                                                               replaced_value=0)
+
+
 
         results = {
             'ds': [str(ds) for ds in list(predicted_data['ds'])],
