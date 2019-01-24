@@ -36,7 +36,7 @@ class PredictorFactory(object):
 
 def create_predictor(predictor_type, ts_values, y_values, **kwargs):
     """
-    Create predictor project based on predictor_type
+    Create predictor project based on predictor_type.
 
     Parameters
     ----------

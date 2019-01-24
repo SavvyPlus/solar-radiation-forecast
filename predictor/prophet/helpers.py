@@ -4,21 +4,27 @@ import pandas as pd
 
 
 def get_night_patterns(df, index_col='date', val_col='radiation', limit=17520):
-    """Short summary.
+    """
+    Based on historical data we get hours have zero radiation in each month.
 
     Parameters
     ----------
-    df : type
-        Description of parameter `df`.
-    limit : type
-        Description of parameter `limit`.
+    df : DataFrame
+        DataFrame of solar radiation historical data.
+    index_col : str, default 'date'
+        Name of timestamp column used to index.
+    val_col : str, default 'radiation'
+        Name of radiation column.
+    limit : int, default 17520
+        Maximum historical data to get patterns.
 
     Returns
     -------
-    type
-        Description of returned object.
+    patterns : dict
+        Ex: {'month': [hours have 0 value]}
 
     """
+
     patterns = {}
 
     # pre-process df
@@ -49,17 +55,20 @@ def get_night_patterns(df, index_col='date', val_col='radiation', limit=17520):
 
 
 def normalize_night_pattern(pattern):
-    """Short summary.
+    """
+    Due to missing data or incorrect data some hours may have zero
+    radiation value. We only get common hours in a month which means hours
+    appear less than 50 percentile will be removed.
 
     Parameters
     ----------
-    pattern : type
-        Description of parameter `pattern`.
+    pattern : list
+        List of hours. Ex [0, 0, ..., 0, 1, 1, 1, ..., 8] 8 will be removed
 
     Returns
     -------
-    type
-        Description of returned object.
+    valid_values : list
+        List of hours should have zero value.
 
     """
     counter = dict(Counter(pattern))
@@ -72,19 +81,23 @@ def normalize_night_pattern(pattern):
 
 
 def fill_night_value(df, night_patterns, index_col='ds', value=0):
-    """Short summary.
+    """Update predicted night value by other value.
 
     Parameters
     ----------
-    df : type
-        Description of parameter `df`.
-    value : type
-        Description of parameter `value`.
+    df : DataFrame
+        DataFrame of predicted data need to change night time to zero.
+    night_patterns : dict
+        Result from `get_night_patterns()` function.
+    index_col : str, default 'ds'
+        Name of timestamp column used to index.
+    value : int, default 0
+        Replace predicted night value by this value
 
     Returns
     -------
-    type
-        Description of returned object.
+    df: DataFrame
+        DataFrame of predicted data with update night values.
 
     """
     # pre-process df
@@ -102,11 +115,3 @@ def fill_night_value(df, night_patterns, index_col='ds', value=0):
 def replace_negative_values(df, val_col, threshold=0, replaced_value=0):
     df[df[val_col]<threshold] = replaced_value
     return df
-
-
-
-# df = pd.read_csv('../../big_data/full/dni/filled/14.1.csv')
-# night_patterns = get_night_patterns(df, index_col='date', val_col='radiation', limit=17520)
-#
-# df = fill_night_value(df, night_patterns, index_col='date', value=22222)
-# print(df.head(100))
